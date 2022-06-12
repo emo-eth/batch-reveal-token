@@ -49,9 +49,7 @@ abstract contract BatchReveal is ERC721A, Ownable {
     ///@dev permanently use the defaultURI, which should be updated to final URI
     function setFullyRevealed() public onlyOwner {
         fullyRevealed = true;
-        while (reveals.length > 0) {
-            reveals.pop();
-        }
+        delete reveals;
     }
 
     function tokenURI(uint256 _tokenId) public view virtual override returns (string memory) {

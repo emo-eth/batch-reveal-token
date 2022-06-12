@@ -4,7 +4,6 @@ pragma solidity ^0.8.13;
 import {ERC721A} from "ERC721A/ERC721A.sol";
 import {IERC2981} from "openzeppelin-contracts/interfaces/IERC2981.sol";
 import {IERC165} from "openzeppelin-contracts/interfaces/IERC165.sol";
-import {Strings} from "openzeppelin-contracts/utils/Strings.sol";
 import {AllowList} from "./lib/AllowList.sol";
 import {BatchReveal} from "./lib/BatchReveal.sol";
 import {MaxMintable} from "./lib/MaxMintable.sol";
@@ -13,8 +12,6 @@ import {TwoStepOwnable} from "./lib/TwoStepOwnable.sol";
 import {Ownable} from "openzeppelin-contracts/access/Ownable.sol";
 
 contract Token is MaxMintable, IERC2981, AllowList, BatchReveal, TwoStepOwnable, Withdrawable {
-    using Strings for uint256;
-
     uint256 immutable MAX_PUBLIC_MINTABLE;
     uint256 immutable MAX_DEV_MINTABLE;
 
@@ -150,7 +147,13 @@ contract Token is MaxMintable, IERC2981, AllowList, BatchReveal, TwoStepOwnable,
         royaltyRecipient = recipient;
     }
 
-    function supportsInterface(bytes4 interfaceId) public view virtual override(ERC721A, IERC165) returns (bool) {
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        virtual
+        override(ERC721A, IERC165)
+        returns (bool)
+    {
         return ERC721A.supportsInterface(interfaceId) || type(IERC2981).interfaceId == interfaceId;
     }
 
@@ -164,11 +167,21 @@ contract Token is MaxMintable, IERC2981, AllowList, BatchReveal, TwoStepOwnable,
         return (royaltyRecipient, (royaltyBps * salePrice) / 10_000);
     }
 
-    function tokenURI(uint256 tokenId) public view override(ERC721A, BatchReveal) returns (string memory) {
+    function tokenURI(uint256 tokenId)
+        public
+        view
+        override(ERC721A, BatchReveal)
+        returns (string memory)
+    {
         return BatchReveal.tokenURI(tokenId);
     }
 
-    function transferOwnership(address newOwner) public virtual override(Ownable, TwoStepOwnable) onlyOwner {
+    function transferOwnership(address newOwner)
+        public
+        virtual
+        override(Ownable, TwoStepOwnable)
+        onlyOwner
+    {
         TwoStepOwnable.transferOwnership(newOwner);
     }
 }

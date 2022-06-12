@@ -68,6 +68,7 @@ contract BatchRevealTest is Test {
 
     function testSetFullyRevealed() public {
         test.addReveal(1, "uri1/");
+        test.addReveal(2, "uri2/");
         assertEq(test.tokenURI(0), "uri1/0");
         test.setFullyRevealed();
         assertEq(test.tokenURI(0), "default10");
