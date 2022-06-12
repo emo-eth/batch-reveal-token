@@ -6,14 +6,9 @@ import {MaxMintable} from "../../src/lib/MaxMintable.sol";
 import {ERC721A} from "ERC721A/ERC721A.sol";
 
 contract MaxMintableImpl is MaxMintable {
-    constructor(uint256 _maxMintable) MaxMintable("test", "test") {
-        setMaxMintsPerWallet(_maxMintable);
-    }
+    constructor(uint256 _maxMintable) MaxMintable("test", "test", _maxMintable) {}
 
-    function checkAndIncrement(uint256 quantity)
-        public
-        checkMaxMinted(quantity)
-    {
+    function checkAndIncrement(uint256 quantity) public checkMaxMintedForWallet(quantity) {
         _mint(msg.sender, quantity);
     }
 }

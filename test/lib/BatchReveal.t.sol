@@ -8,10 +8,14 @@ import {ERC721A} from "ERC721A/ERC721A.sol";
 
 contract BatchRevealImpl is BatchReveal {
     constructor(bytes32 _provenanceHash) BatchReveal("", _provenanceHash) ERC721A("name", "name") {}
+
+    function mint(uint256 numtokens) public {
+        _mint(msg.sender, numtokens);
+    }
 }
 
 contract BatchRevealTest is Test {
-    BatchReveal test;
+    BatchRevealImpl test;
 
     function setUp() public {
         test = new BatchRevealImpl(bytes32(0));
@@ -67,22 +71,24 @@ contract BatchRevealTest is Test {
     }
 
     function testSetFullyRevealed() public {
+        test.mint(1);
         test.addReveal(1, "uri1/");
         test.addReveal(2, "uri2/");
         assertEq(test.tokenURI(0), "uri1/0");
-        test.setFullyRevealed();
-        assertEq(test.tokenURI(0), "default10");
+        test.setFullyRevealed("revealed/");
+        assertEq(test.tokenURI(0), "revealed/0");
     }
 
     function testSetFullyRevealed_onlyOwner() public {
         test.transferOwnership(address(1));
         vm.expectRevert("Ownable: caller is not the owner");
-        test.setFullyRevealed();
+        test.setFullyRevealed("revealed/");
         vm.expectRevert();
         test.reveals(0);
     }
 
     function testTokenURI() public {
+        test.mint(4);
         // all tokens default by default
         assertEq("default1", test.tokenURI(1));
         // reveals up to id non-inclusive
@@ -96,7 +102,7 @@ contract BatchRevealTest is Test {
         test.setDefaultURI("default2/");
         assertEq("default2/", test.tokenURI(3));
         assertEq("uri2/2", test.tokenURI(2));
-        test.setFullyRevealed();
-        assertEq("default2/1", test.tokenURI(1));
+        test.setFullyRevealed("revealed/");
+        assertEq("revealed/1", test.tokenURI(1));
     }
 }

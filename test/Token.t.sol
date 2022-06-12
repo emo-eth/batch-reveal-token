@@ -20,7 +20,19 @@ contract TokenTest is Test, ERC721Holder {
     bool allowListReentrant;
 
     function setUp() public {
-        test = new Token(name, symbol, 5000, 5309, 500, 0, 0, bytes32(0), "", bytes32(uint256(1)));
+        test = new Token(
+            name,
+            symbol,
+            5,
+            5000,
+            5309,
+            500,
+            0,
+            0,
+            bytes32(0),
+            "",
+            bytes32(uint256(1))
+        );
         root = bytes32(0x0e3c89b8f8b49ac3672650cebf004f2efec487395927033a7de99f85aec9387c);
         test.setMerkleRoot(root);
         ///@notice this proof assumes DAPP_TEST_ADDRESS is its default value, 0xb4c79daB8f259C7Aee6E5b2Aa729821864227e84
@@ -32,7 +44,6 @@ contract TokenTest is Test, ERC721Holder {
 
         test.setMintPrice(mintPrice);
         test.setAllowListMintPrice(mintPrice);
-        test.setMaxMintsPerWallet(5);
         test.setSaleState(Token.SaleState.PUBLIC);
     }
 

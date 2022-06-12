@@ -7,11 +7,17 @@ import {ERC721A} from "ERC721A/ERC721A.sol";
 contract MaxMintable is ERC721A, Ownable {
     uint256 public maxMintsPerWallet;
 
-    constructor(string memory name, string memory symbol) ERC721A(name, symbol) {}
+    constructor(
+        string memory name,
+        string memory symbol,
+        uint256 _maxMintsPerWallet
+    ) ERC721A(name, symbol) {
+        maxMintsPerWallet = _maxMintsPerWallet;
+    }
 
     error MaxMintedForWallet();
 
-    modifier checkMaxMinted(uint256 quantity) {
+    modifier checkMaxMintedForWallet(uint256 quantity) {
         // get num minted from ERC721A
         uint256 numMinted = _numberMinted(msg.sender);
         if ((numMinted + quantity) > maxMintsPerWallet) {

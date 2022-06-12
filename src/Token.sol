@@ -70,6 +70,7 @@ contract Token is MaxMintable, IERC2981, AllowList, BatchReveal, TwoStepOwnable,
     constructor(
         string memory name,
         string memory symbol,
+        uint256 _maxMintsPerWallet,
         uint256 numPublicMintable,
         uint256 numDevMintable,
         uint16 _royaltyBps,
@@ -78,7 +79,11 @@ contract Token is MaxMintable, IERC2981, AllowList, BatchReveal, TwoStepOwnable,
         bytes32 _merkleRoot,
         string memory _defaultURI,
         bytes32 provenanceHash
-    ) MaxMintable(name, symbol) BatchReveal(_defaultURI, provenanceHash) AllowList(_merkleRoot) {
+    )
+        MaxMintable(name, symbol, _maxMintsPerWallet)
+        BatchReveal(_defaultURI, provenanceHash)
+        AllowList(_merkleRoot)
+    {
         royaltyRecipient = msg.sender;
         MAX_DEV_MINTABLE = numDevMintable;
         MAX_PUBLIC_MINTABLE = numPublicMintable;
@@ -94,7 +99,7 @@ contract Token is MaxMintable, IERC2981, AllowList, BatchReveal, TwoStepOwnable,
         payable
         onlyPublic
         canMint(quantity)
-        checkMaxMinted(quantity)
+        checkMaxMintedForWallet(quantity)
         includesCorrectPayment(mintPrice, quantity)
     {
         _mint(msg.sender, quantity);
@@ -108,7 +113,7 @@ contract Token is MaxMintable, IERC2981, AllowList, BatchReveal, TwoStepOwnable,
         whenNotPaused
         canMint(quantity)
         onlyAllowListed(proof)
-        checkMaxMinted(quantity)
+        checkMaxMintedForWallet(quantity)
         includesCorrectPayment(allowListMintPrice, quantity)
     {
         _mint(msg.sender, quantity);
@@ -162,9 +167,20 @@ contract Token is MaxMintable, IERC2981, AllowList, BatchReveal, TwoStepOwnable,
         external
         view
         virtual
+        override
         returns (address receiver, uint256 royaltyAmount)
     {
         return (royaltyRecipient, (royaltyBps * salePrice) / 10_000);
+    }
+
+    function _baseURI()
+        internal
+        view
+        virtual
+        override(ERC721A, BatchReveal)
+        returns (string memory)
+    {
+        return BatchReveal._baseURI();
     }
 
     function tokenURI(uint256 tokenId)

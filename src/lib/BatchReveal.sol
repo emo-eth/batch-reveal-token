@@ -43,13 +43,22 @@ abstract contract BatchReveal is ERC721A, Ownable {
 
     ///@dev update defaultURI
     function setDefaultURI(string memory finalURI) public onlyOwner {
+        _setDefaultURI(finalURI);
+    }
+
+    function _setDefaultURI(string memory finalURI) internal {
         defaultURI = finalURI;
     }
 
     ///@dev permanently use the defaultURI, which should be updated to final URI
-    function setFullyRevealed() public onlyOwner {
+    function setFullyRevealed(string memory finalURI) public onlyOwner {
         fullyRevealed = true;
         delete reveals;
+        _setDefaultURI(finalURI);
+    }
+
+    function _baseURI() internal view virtual override returns (string memory) {
+        return defaultURI;
     }
 
     function tokenURI(uint256 _tokenId) public view virtual override returns (string memory) {
@@ -65,6 +74,6 @@ abstract contract BatchReveal is ERC721A, Ownable {
             }
         }
         // if fully revealed, concat tokenId to defaultURI; otherwise, return defaultURI as-is
-        return fullyRevealed ? string.concat(defaultURI, _toString(_tokenId)) : defaultURI;
+        return fullyRevealed ? super.tokenURI(_tokenId) : defaultURI;
     }
 }
